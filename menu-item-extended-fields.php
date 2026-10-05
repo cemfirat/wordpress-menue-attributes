@@ -1,10 +1,18 @@
 <?php
-/*
-Plugin Name: Menüfeld Erweiterung (ID, Class & Attribute) – 1.5.5
-Description: Fügt ID-, Class- und Attribute-Felder zu Menüeinträgen hinzu. Gehärtete Validierung, JS-Fallback und sichere Bereinigung via uninstall.php. Behebt fehlende Datenübergabe an das JS (CF_MEF_DATA).
-Version: 1.5.5
-Author: Cem Firat
-*/
+/**
+ * Plugin Name: Menüfeld Erweiterung (ID, Class & Attribute)
+ * Plugin URI: https://github.com/cemfirat/wordpress-menue-attributes
+ * Description: Fügt ID-, Class- und Attribute-Felder zu Menüeinträgen hinzu.
+ * Version: 1.5.5
+ * Requires at least: 5.4
+ * Requires PHP: 7.0
+ * Author: Cem Firat
+ * Author URI: https://cemfirat.com/
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Update URI: https://github.com/cemfirat/wordpress-menue-attributes
+ * Text Domain: wordpress-menue-attributes
+ */
 
 namespace CF\MEF;
 
