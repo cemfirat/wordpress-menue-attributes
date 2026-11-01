@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cemfirat/repository-governance/main/blueprints/wordpress-plugin/manifest.schema.json",
+  "schema_version": 1,
+  "blueprint": "wordpress-plugin",
+  "blueprint_version": "0.2.0",
+  "profile": "simple",
+  "plugin": {
+    "slug": "wordpress-menue-attributes",
+    "name": "Menüfeld Erweiterung (ID, Class & Attribute)",
+    "main_file": "menu-item-extended-fields.php",
+    "version": "1.5.5",
+    "text_domain": "wordpress-menue-attributes",
+    "minimum_wordpress": "5.4",
+    "minimum_php": "7.0",
+    "author": "Cem Firat",
+    "license": "GPL-2.0-or-later",
+    "license_header": "GPL-2.0-or-later",
+    "root": ".",
+    "license_mode": "managed-gpl"
+  },
+  "distribution": {
+    "channel": "github-releases",
+    "update_uri": "https://github.com/cemfirat/wordpress-menue-attributes",
+    "updates": "none"
+  },
+  "features": {
+    "block_plugin": false,
+    "playground_preview": false
+  }
+}

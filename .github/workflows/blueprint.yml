@@ -1,0 +1,50 @@
+name: WordPress plugin blueprint
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  blueprint:
+    name: WordPress plugin blueprint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out plugin
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Audit plugin against pinned blueprint
+        uses: cemfirat/repository-governance/blueprints/wordpress-plugin@8f3cb9d0ba9bfdb95d5a3510a5293950b523f10a
+        with:
+          plugin-root: .
+
+      - name: Set up PHP for the focused contracts
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.3'
+          tools: none
+          coverage: none
+
+      - name: Set up Node.js for the DOM contract
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Check PHP syntax
+        run: |
+          php -l menu-item-extended-fields.php
+          php -l uninstall.php
+          php -l tests/attribute-contract.php
+
+      - name: Verify PHP output and inline data contracts
+        run: php tests/attribute-contract.php
+
+      - name: Verify the DOM patcher with the actual PHP payload
+        run: node --test tests/dom-patcher.test.cjs

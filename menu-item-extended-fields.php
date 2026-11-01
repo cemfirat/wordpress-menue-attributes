@@ -1,10 +1,18 @@
 <?php
-/*
-Plugin Name: Menüfeld Erweiterung (ID, Class & Attribute) – 1.5.5
-Description: Fügt ID-, Class- und Attribute-Felder zu Menüeinträgen hinzu. Gehärtete Validierung, JS-Fallback und sichere Bereinigung via uninstall.php. Behebt fehlende Datenübergabe an das JS (CF_MEF_DATA).
-Version: 1.5.5
-Author: Cem Firat
-*/
+/**
+ * Plugin Name: Menüfeld Erweiterung (ID, Class & Attribute)
+ * Plugin URI: https://github.com/cemfirat/wordpress-menue-attributes
+ * Description: Fügt ID-, Class- und Attribute-Felder zu Menüeinträgen hinzu.
+ * Version: 1.5.5
+ * Requires at least: 5.4
+ * Requires PHP: 7.0
+ * Author: Cem Firat
+ * Author URI: https://cemfirat.com/
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Update URI: https://github.com/cemfirat/wordpress-menue-attributes
+ * Text Domain: wordpress-menue-attributes
+ */
 
 namespace CF\MEF;
 
@@ -165,7 +173,7 @@ add_filter('wp_get_nav_menu_items', function ($items, $menu, $args) {
 
 add_action('wp_enqueue_scripts', function () {
     // JS registrieren + enqueuen
-    wp_register_script('cf-mef-dom', plugins_url('public/dom-patcher.js', __FILE__), [], '1.4', true);
+    wp_register_script('cf-mef-dom', plugins_url('public/dom-patcher.js', __FILE__), [], '1.5.5-attributes-1', true);
     wp_enqueue_script('cf-mef-dom');
 
     // Map zusammenstellen
@@ -187,7 +195,7 @@ add_action('wp_enqueue_scripts', function () {
                     'hash'         => parse_url($url, PHP_URL_FRAGMENT),
                     'custom_id'    => $cid,
                     'custom_class' => $cls,
-                    'custom_attr'  => $att,
+                    'custom_attr'  => (object) parse_and_sanitize_attributes($att),
                 ];
             }
         }
@@ -209,14 +217,19 @@ add_action('wp_enqueue_scripts', function () {
                         'hash'         => parse_url($it->url, PHP_URL_FRAGMENT),
                         'custom_id'    => $cid,
                         'custom_class' => $cls,
-                        'custom_attr'  => $att,
+                        'custom_attr'  => (object) parse_and_sanitize_attributes($att),
                     ];
                 }
             }
         }
     }
 
-    // JSON inline bereitstellen (CSP-freundlich, keine lokale globale Var nötig)
-    $json = wp_json_encode(['items' => $map], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    // Beide Ausgabewege verwenden dieselben PHP-normalisierten Attributpaare.
+    // Werte bleiben Daten, auch wenn sie HTML-/Script-Endmarker enthalten.
+    $json = wp_json_encode(
+        ['items' => $map],
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+    );
+    if ($json === false) return;
     wp_add_inline_script('cf-mef-dom', 'window.CF_MEF_DATA = ' . $json . ';', 'before');
 }, 20);

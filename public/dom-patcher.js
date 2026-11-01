@@ -2,9 +2,17 @@
     var data = (typeof window.CF_MEF_DATA !== 'undefined' && window.CF_MEF_DATA) ? window.CF_MEF_DATA : {items:[]};
     var items = Array.isArray(data.items) ? data.items : [];
 
-    function setAttr(el, key, val) {
-        if (val === true || val === '') el.setAttribute(key, '');
-        else el.setAttribute(key, String(val));
+    function applyAttributes(el, attributes) {
+        // PHP supplies the same normalized pairs as nav_menu_link_attributes.
+        // Do not reinterpret saved text with a second attribute parser.
+        if (!attributes || typeof attributes !== 'object' || Array.isArray(attributes)) return;
+        Object.keys(attributes).forEach(function(key) {
+            var val = attributes[key];
+            if (!/^(?:role|rel|target|download|(?:aria-|data-|uk-)[a-z0-9_-]*)$/.test(key) || typeof val !== 'string') return;
+            if (key === 'target' && ['_self', '_blank', '_parent', '_top'].indexOf(val) === -1) return;
+            if (key === 'rel' && !/^(?:[a-z-]+(?: [a-z-]+)*)?$/.test(val)) return;
+            el.setAttribute(key, val);
+        });
     }
     function matchesAnchor(a, item) {
         var href = a.getAttribute('href') || '';
@@ -27,13 +35,7 @@
                 if (!matchesAnchor(a, item)) return;
                 if (item.custom_id) a.id = item.custom_id;
                 if (item.custom_class) item.custom_class.split(/\s+/).filter(Boolean).forEach(function(c){ a.classList.add(c); });
-                if (item.custom_attr) {
-                    var re = /([A-Za-z0-9\-\_]+)(?:="([^"]*)"|'([^']*)')?/g, m;
-                    while ((m = re.exec(item.custom_attr)) !== null) {
-                        var key = m[1], val = m[2] || m[3] || '';
-                        setAttr(a, key, val);
-                    }
-                }
+                applyAttributes(a, item.custom_attr);
             });
         });
     }
